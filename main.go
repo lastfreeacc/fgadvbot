@@ -2,28 +2,30 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"golang.org/x/net/html"
-	"github.com/lastfreeacc/fgadvbot/teleapi"
+
 	"github.com/lastfreeacc/fgadvbot/parse"
-	"fmt"
+	"github.com/lastfreeacc/fgadvbot/teleapi"
+	"golang.org/x/net/html"
 )
 
 type cmd string
 
 const (
 	confFilename = "fgadvbot.conf.json"
-	startCmd  = "/start"
-	advCmd  = "/adv"
-	herCmd  = "/her"
+	startCmd     = "/start"
+	advCmd       = "/adv"
+	herCmd       = "/her"
 )
 
 var (
-	conf = make(map[string]interface{})
+	conf     = make(map[string]interface{})
 	botToken string
-	bot teleapi.Bot
+	bot      teleapi.Bot
+	nextAdv  = "http://fucking-great-advice.ru/"
 )
 
 func main() {
@@ -37,7 +39,7 @@ func main() {
 			doAdv(update)
 		default:
 			bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
-		} 
+		}
 	}
 }
 
@@ -67,7 +69,7 @@ func doStrart(update *teleapi.Update) {
 }
 
 func doAdv(update *teleapi.Update) {
-	r, err := http.Get("http://fucking-great-advice.ru/")
+	r, err := http.Get(nextAdv)
 	if err != nil {
 		log.Printf("[Warning] can not get advice, err: %s\n", err)
 		return
@@ -88,6 +90,16 @@ func doAdv(update *teleapi.Update) {
 		log.Printf("[Warning] can not parse, err: %s", err)
 		return
 	}
+	next, err := parse.GetElementByID(root, "next")
+	if err != nil {
+		log.Printf("[Warning] can not find next, err: %s", err)
+	}
+	if next != nil {
+		nextHref := parse.GetAttr(next, "href")
+		if nextHref != "" {
+			nextAdv = nextHref
+		}
+	}
 	adv, err := parse.GetElementByID(root, "advice")
 	if err != nil {
 		log.Printf("[Warning] can not find advice, err: %s", err)
@@ -95,5 +107,8 @@ func doAdv(update *teleapi.Update) {
 	}
 	msg := parse.GetTextFromTag(adv)
 
-	bot.SendMessage(update.Message.Chat.ID, msg)
+	err = bot.SendMessage(update.Message.Chat.ID, msg)
+	if err != nil {
+		log.Printf("[Warning] some troubles with send, err: %s", err)
+	}
 }

@@ -2,9 +2,10 @@ package parse
 
 import (
 	"strings"
-	
-	"golang.org/x/net/html"
+
 	"errors"
+
+	"golang.org/x/net/html"
 )
 
 var (
@@ -12,13 +13,14 @@ var (
 	ErrNoSuchElement = errors.New("No such element")
 )
 
-func getAtr(n *html.Node, atrName string) string {
+// GetAttr ...
+func GetAttr(n *html.Node, attrName string) string {
 	if n == nil {
 		return ""
 	}
-	for _, atr := range n.Attr {
-		if atr.Key == atrName {
-			return atr.Val
+	for _, attr := range n.Attr {
+		if attr.Key == attrName {
+			return attr.Val
 		}
 	}
 	return ""
@@ -41,7 +43,7 @@ func getElementWithClass(n *html.Node, tag, class string) (res *html.Node) {
 	return res
 }
 
-// GetTextFromTag ... 
+// GetTextFromTag ...
 func GetTextFromTag(n *html.Node) string {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if c.Type == html.TextNode {
@@ -51,7 +53,7 @@ func GetTextFromTag(n *html.Node) string {
 	return ""
 }
 
-// GetElementByID ... 
+// GetElementByID ...
 func GetElementByID(n *html.Node, id string) (*html.Node, error) {
 	if n.Type == html.ElementNode {
 		for _, attr := range n.Attr {
