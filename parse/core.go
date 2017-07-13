@@ -41,6 +41,16 @@ func getElementWithClass(n *html.Node, tag, class string) (res *html.Node) {
 	return res
 }
 
+// GetTextFromTag ... 
+func GetTextFromTag(n *html.Node) string {
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		if c.Type == html.TextNode {
+			return c.Data
+		}
+	}
+	return ""
+}
+
 // GetElementByID ... 
 func GetElementByID(n *html.Node, id string) (*html.Node, error) {
 	if n.Type == html.ElementNode {
@@ -51,10 +61,7 @@ func GetElementByID(n *html.Node, id string) (*html.Node, error) {
 		}
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		res, err := GetElementByID(c, id)
-		if err != nil {
-			return nil, err
-		}
+		res, _ := GetElementByID(c, id)
 		if res != nil {
 			return res, nil
 		}

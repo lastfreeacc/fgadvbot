@@ -93,6 +93,7 @@ func doAdv(update *teleapi.Update) {
 		log.Printf("[Warning] can not find advice, err: %s", err)
 		return
 	}
-	// msg := adv.Data
-	bot.SendMessage(update.Message.Chat.ID, adv.Data)
+	msg := parse.GetTextFromTag(adv)
+
+	bot.SendMessage(update.Message.Chat.ID, msg)
 }
