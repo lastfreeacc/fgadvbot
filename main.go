@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-
+	"net/http"
+	"golang.org/x/net/html"
 	"github.com/lastfreeacc/fgadvbot/teleapi"
+	"github.com/lastfreeacc/fgadvbot/parse"
 	"fmt"
 )
 
@@ -31,6 +33,8 @@ func main() {
 		switch update.Message.Text {
 		case startCmd:
 			doStrart(update)
+		case advCmd:
+			doAdv(update)
 		default:
 			bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
 		} 
@@ -60,4 +64,35 @@ func readMapFromJSON(filename string, mapVar *map[string]interface{}) {
 func doStrart(update *teleapi.Update) {
 	msg := fmt.Sprint("Hello, usage: \n/her for her\n/adv for not her")
 	bot.SendMessage(update.Message.Chat.ID, msg)
+}
+
+func doAdv(update *teleapi.Update) {
+	r, err := http.Get("http://fucking-great-advice.ru/")
+	if err != nil {
+		log.Printf("[Warning] can not get advice, err: %s\n", err)
+		return
+	}
+	if r.StatusCode >= 400 {
+		log.Printf("[Warning] bad status: %d\n", r.StatusCode)
+		return
+	}
+	body := r.Body
+	if body == nil {
+		log.Printf("[Warning] nil body: %s", body)
+		return
+	}
+	defer body.Close()
+
+	root, err := html.Parse(body)
+	if err != nil {
+		log.Printf("[Warning] can not parse, err: %s", err)
+		return
+	}
+	adv, err := parse.GetElementByID(root, "advice")
+	if err != nil {
+		log.Printf("[Warning] can not find advice, err: %s", err)
+		return
+	}
+	// msg := adv.Data
+	bot.SendMessage(update.Message.Chat.ID, adv.Data)
 }
