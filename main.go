@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
+	"strings"
 
-	"github.com/lastfreeacc/fgadvbot/parse"
+	"github.com/lastfreeacc/fgadvbot/fgaapi"
 	"github.com/lastfreeacc/fgadvbot/teleapi"
-	"golang.org/x/net/html"
 )
 
 type cmd string
@@ -25,7 +24,7 @@ var (
 	conf     = make(map[string]interface{})
 	botToken string
 	bot      teleapi.Bot
-	nextAdv  = "http://fucking-great-advice.ru/"
+	// nextAdv  = "http://fucking-great-advice.ru/"
 )
 
 func main() {
@@ -37,6 +36,8 @@ func main() {
 			doStrart(update)
 		case advCmd:
 			doAdv(update)
+		case herCmd:
+			doHer(update)
 		default:
 			bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
 		}
@@ -69,46 +70,72 @@ func doStrart(update *teleapi.Update) {
 }
 
 func doAdv(update *teleapi.Update) {
-	r, err := http.Get(nextAdv)
+	adv, err := fgaapi.GetRandomAdvice()
 	if err != nil {
-		log.Printf("[Warning] can not get advice, err: %s\n", err)
+		log.Printf("[Warning] can not get random advice: '%s'\n", err)
 		return
 	}
-	if r.StatusCode >= 400 {
-		log.Printf("[Warning] bad status: %d\n", r.StatusCode)
-		return
-	}
-	body := r.Body
-	if body == nil {
-		log.Printf("[Warning] nil body: %s", body)
-		return
-	}
-	defer body.Close()
-
-	root, err := html.Parse(body)
-	if err != nil {
-		log.Printf("[Warning] can not parse, err: %s", err)
-		return
-	}
-	next, err := parse.GetElementByID(root, "next")
-	if err != nil {
-		log.Printf("[Warning] can not find next, err: %s", err)
-	}
-	if next != nil {
-		nextHref := parse.GetAttr(next, "href")
-		if nextHref != "" {
-			nextAdv = nextHref
-		}
-	}
-	adv, err := parse.GetElementByID(root, "advice")
-	if err != nil {
-		log.Printf("[Warning] can not find advice, err: %s", err)
-		return
-	}
-	msg := parse.GetTextFromTag(adv)
-
+	msg := strings.Replace(adv.Text, "&nbsp;", " ", -1)
 	err = bot.SendMessage(update.Message.Chat.ID, msg)
 	if err != nil {
 		log.Printf("[Warning] some troubles with send, err: %s", err)
 	}
 }
+
+func doHer(update *teleapi.Update) {
+	adv, err := fgaapi.GetRandomHerAdvice()
+	if err != nil {
+		log.Printf("[Warning] can not get random her advice: '%s'\n", err)
+		return
+	}
+	msg := strings.Replace(adv.Text, "&nbsp;", " ", -1)
+	err = bot.SendMessage(update.Message.Chat.ID, msg)
+	if err != nil {
+		log.Printf("[Warning] some troubles with send, err: %s", err)
+	}
+}
+
+// func doAdv(update *teleapi.Update) {
+// 	r, err := http.Get(nextAdv)
+// 	if err != nil {
+// 		log.Printf("[Warning] can not get advice, err: %s\n", err)
+// 		return
+// 	}
+// 	if r.StatusCode >= 400 {
+// 		log.Printf("[Warning] bad status: %d\n", r.StatusCode)
+// 		return
+// 	}
+// 	body := r.Body
+// 	if body == nil {
+// 		log.Printf("[Warning] nil body: %s", body)
+// 		return
+// 	}
+// 	defer body.Close()
+
+// 	root, err := html.Parse(body)
+// 	if err != nil {
+// 		log.Printf("[Warning] can not parse, err: %s", err)
+// 		return
+// 	}
+// 	next, err := parse.GetElementByID(root, "next")
+// 	if err != nil {
+// 		log.Printf("[Warning] can not find next, err: %s", err)
+// 	}
+// 	if next != nil {
+// 		nextHref := parse.GetAttr(next, "href")
+// 		if nextHref != "" {
+// 			nextAdv = nextHref
+// 		}
+// 	}
+// 	adv, err := parse.GetElementByID(root, "advice")
+// 	if err != nil {
+// 		log.Printf("[Warning] can not find advice, err: %s", err)
+// 		return
+// 	}
+// 	msg := parse.GetTextFromTag(adv)
+
+// 	err = bot.SendMessage(update.Message.Chat.ID, msg)
+// 	if err != nil {
+// 		log.Printf("[Warning] some troubles with send, err: %s", err)
+// 	}
+// }
