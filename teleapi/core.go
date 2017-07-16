@@ -12,9 +12,9 @@ import (
 type method string
 
 const (
-	apiURL string = "https://api.telegram.org/bot"
- 	sendMessageMthd method = "sendMessage"
- 	getUpdates method = "getUpdates"
+	apiURL          string = "https://api.telegram.org/bot"
+	sendMessageMthd method = "sendMessage"
+	getUpdates      method = "getUpdates"
 )
 
 type bot struct {
@@ -48,7 +48,7 @@ func (bot *bot) SendMessage(chatID int64, text string) error {
 	jsonStr := fmt.Sprintf(`{"chat_id":"%d","text":"%s"}`, chatID, text)
 	json := []byte(jsonStr)
 	endPnt := bot.makeURL(sendMessageMthd)
-	req, err := http.NewRequest("POST", endPnt, bytes.NewBuffer(json))
+	req, err := http.NewRequest(http.MethodPost, endPnt, bytes.NewBuffer(json))
 	if err != nil {
 		log.Printf("[Error] in build req: %s", err.Error())
 		return err
@@ -78,7 +78,7 @@ func doUpdates(bot *bot) {
 	for {
 		jsonStr := fmt.Sprintf(`{"offset":%d, "timeout": 60}`, bot.currenOffset+1)
 		jsonBlob := []byte(jsonStr)
-		req, err := http.NewRequest("POST", endPnt, bytes.NewBuffer(jsonBlob))
+		req, err := http.NewRequest(http.MethodPost, endPnt, bytes.NewBuffer(jsonBlob))
 		if err != nil {
 			log.Printf("[Warning] can not getUpdates: %s", err.Error())
 			continue
