@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
 )
+
+type method string
 
 const (
 	apiURL              = "http://fucking-great-advice.ru/api/"
@@ -18,11 +21,9 @@ const (
 var (
 	// ErrBadStatus ...
 	ErrBadStatus = errors.New("Bad status")
-	//
+	// ErrEmptyBody ...
 	ErrEmptyBody = errors.New("Empty body")
 )
-
-type method string
 
 // Advice ..
 type Advice struct {
@@ -64,11 +65,12 @@ func getAdvice(endPnt string) (*Advice, error) {
 		log.Printf("[Warning] some problems when read body, err: %s\n", err)
 		return nil, err
 	}
-	adv := &Advice{}
-	err = json.Unmarshal(advBytes, adv)
+	var adv Advice
+	err = json.Unmarshal(advBytes, &adv)
 	if err != nil {
 		log.Printf("[Warning] some problems when unmarshal json, err: %s\n", err)
 		return nil, err
 	}
-	return adv, nil
+	adv.Text = html.UnescapeString(adv.Text)
+	return &adv, nil
 }

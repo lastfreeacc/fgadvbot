@@ -14,11 +14,15 @@ import (
 type cmd string
 
 const (
-	confFilename = "fgadvbot.conf.json"
-	startCmd     = "/start"
-	advCmd       = "/adv"
-	herCmd       = "/her"
+	confFilename     = "fgadvbot.conf.json"
+	startCmd     cmd = "/start"
+	advCmd       cmd = "/adv"
+	herCmd       cmd = "/her"
 )
+
+func (c cmd) isMe(msg string) bool {
+	return strings.HasPrefix(msg, string(c))
+}
 
 var (
 	conf     = make(map[string]interface{})
@@ -31,12 +35,12 @@ func main() {
 	myInit()
 	upCh := bot.Listen()
 	for update := range upCh {
-		switch update.Message.Text {
-		case startCmd:
+		switch true {
+		case startCmd.isMe(update.Message.Text):
 			doStrart(update)
-		case advCmd:
+		case advCmd.isMe(update.Message.Text):
 			doAdv(update)
-		case herCmd:
+		case herCmd.isMe(update.Message.Text):
 			doHer(update)
 		default:
 			bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
@@ -65,7 +69,12 @@ func readMapFromJSON(filename string, mapVar *map[string]interface{}) {
 }
 
 func doStrart(update *teleapi.Update) {
-	msg := fmt.Sprint("Hello, usage: \n/her for her\n/adv for not her")
+	msg := fmt.Sprint(
+		`Hello, i am an advice bot!
+	Fucking Great Advice!
+	Usage:
+	/her for her
+	/adv for not her`)
 	bot.SendMessage(update.Message.Chat.ID, msg)
 }
 
@@ -75,8 +84,7 @@ func doAdv(update *teleapi.Update) {
 		log.Printf("[Warning] can not get random advice: '%s'\n", err)
 		return
 	}
-	msg := strings.Replace(adv.Text, "&nbsp;", " ", -1)
-	err = bot.SendMessage(update.Message.Chat.ID, msg)
+	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)
 	if err != nil {
 		log.Printf("[Warning] some troubles with send, err: %s", err)
 	}
@@ -88,8 +96,7 @@ func doHer(update *teleapi.Update) {
 		log.Printf("[Warning] can not get random her advice: '%s'\n", err)
 		return
 	}
-	msg := strings.Replace(adv.Text, "&nbsp;", " ", -1)
-	err = bot.SendMessage(update.Message.Chat.ID, msg)
+	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)
 	if err != nil {
 		log.Printf("[Warning] some troubles with send, err: %s", err)
 	}
