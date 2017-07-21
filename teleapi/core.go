@@ -99,6 +99,7 @@ func doUpdates(bot *bot) {
 		err = json.Unmarshal(respBlob, &result)
 		if err != nil {
 			log.Printf("[Warning] can not unmarshal resp: %s\n", err.Error())
+			log.Printf("[Data] json is: %s\n", respBlob)
 			continue
 		}
 		if !result.Ok {

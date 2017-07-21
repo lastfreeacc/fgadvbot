@@ -38,8 +38,8 @@ func main() {
 			doAdv(update)
 		case herCmd:
 			doHer(update)
-		default:
-			bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
+		// default:
+		// 	bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
 		}
 	}
 }
