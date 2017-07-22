@@ -18,6 +18,7 @@ const (
 	startCmd     cmd = "/start"
 	advCmd       cmd = "/adv"
 	herCmd       cmd = "/her"
+	codeCmd      cmd = "/code"
 )
 
 func (c cmd) isMe(msg string) bool {
@@ -28,22 +29,22 @@ var (
 	conf     = make(map[string]interface{})
 	botToken string
 	bot      teleapi.Bot
-	// nextAdv  = "http://fucking-great-advice.ru/"
 )
 
 func main() {
 	myInit()
 	upCh := bot.Listen()
 	for update := range upCh {
+		cmd := update.Message.Text
 		switch true {
-		case startCmd.isMe(update.Message.Text):
+		case startCmd.isMe(cmd):
 			doStrart(update)
-		case advCmd.isMe(update.Message.Text):
+		case advCmd.isMe(cmd):
 			doAdv(update)
-		case herCmd.isMe(update.Message.Text):
+		case herCmd.isMe(cmd):
 			doHer(update)
-		// default:
-		// 	bot.SendMessage(update.Message.Chat.ID, update.Message.Text)
+		case codeCmd.isMe(cmd):
+			doCode(update)
 		}
 	}
 }
@@ -93,7 +94,19 @@ func doAdv(update *teleapi.Update) {
 func doHer(update *teleapi.Update) {
 	adv, err := fgaapi.GetRandomHerAdvice()
 	if err != nil {
-		log.Printf("[Warning] can not get random her advice: '%s'\n", err)
+		log.Printf("[Warning] can not get advice for her: '%s'\n", err)
+		return
+	}
+	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)
+	if err != nil {
+		log.Printf("[Warning] some troubles with send, err: %s", err)
+	}
+}
+
+func doCode(update *teleapi.Update) {
+	adv, err := fgaapi.GetRandomCoderAdvice()
+	if err != nil {
+		log.Printf("[Warning] can not get advice for coder: '%s'\n", err)
 		return
 	}
 	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)

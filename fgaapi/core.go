@@ -13,9 +13,10 @@ import (
 type method string
 
 const (
-	apiURL              = "http://fucking-great-advice.ru/api/"
-	randomMth    method = "random"
-	randomHerMth method = "random_by_tag/для%20нее"
+	apiURL                = "http://fucking-great-advice.ru/api/"
+	randomMth      method = "random"
+	randomHerMth   method = "random_by_tag/для%20нее"
+	randomCoderMth method = "random_by_tag/кодеру"
 )
 
 var (
@@ -41,6 +42,12 @@ func GetRandomAdvice() (*Advice, error) {
 // GetRandomHerAdvice ...
 func GetRandomHerAdvice() (*Advice, error) {
 	endPnt := fmt.Sprintf("%s%s", apiURL, randomHerMth)
+	return getAdvice(endPnt)
+}
+
+// GetRandomCoderAdvice ...
+func GetRandomCoderAdvice() (*Advice, error) {
+	endPnt := fmt.Sprintf("%s%s", apiURL, randomCoderMth)
 	return getAdvice(endPnt)
 }
 
