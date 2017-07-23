@@ -104,6 +104,7 @@ func doUpdates(bot *bot) {
 		}
 		if !result.Ok {
 			log.Printf("[Warning] result not ok\n")
+			log.Printf("[Data] json is: %+v\n", result)
 			continue
 		}
 		for _, update := range result.Result {
