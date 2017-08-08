@@ -75,7 +75,8 @@ func doStrart(update *teleapi.Update) {
 	Fucking Great Advice!
 	Usage:
 	/her for her
-	/adv for not her`)
+	/adv for not her
+	/code leave it for me`)
 	bot.SendMessage(update.Message.Chat.ID, msg)
 }
 
