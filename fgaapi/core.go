@@ -28,7 +28,7 @@ var (
 
 // Advice ..
 type Advice struct {
-	ID    string `json:"id"`
+	ID    int64  `json:"id"`
 	Text  string `json:"text"`
 	Sound string `json:"sound"`
 }
