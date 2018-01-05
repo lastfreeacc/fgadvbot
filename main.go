@@ -80,10 +80,17 @@ func doStrart(update *teleapi.Update) {
 	bot.SendMessage(update.Message.Chat.ID, msg)
 }
 
+const fgaAPIFail string = `Не могу дать то, что ты хочешь.
+Попробуй зайти на оригинал: `
+
 func doAdv(update *teleapi.Update) {
 	adv, err := fgaapi.GetRandomAdvice()
 	if err != nil {
 		log.Printf("[Warning] can not get random advice: '%s'\n", err)
+		err = bot.SendMessage(update.Message.Chat.ID, fgaAPIFail+"http://fucking-great-advice.ru")
+		if err != nil {
+			log.Printf("[Warning] some troubles with send, err: %s", err)
+		}
 		return
 	}
 	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)
@@ -96,6 +103,10 @@ func doHer(update *teleapi.Update) {
 	adv, err := fgaapi.GetRandomHerAdvice()
 	if err != nil {
 		log.Printf("[Warning] can not get advice for her: '%s'\n", err)
+		err = bot.SendMessage(update.Message.Chat.ID, fgaAPIFail+"http://fucking-great-advice.ru/advice/for-her")
+		if err != nil {
+			log.Printf("[Warning] some troubles with send, err: %s", err)
+		}
 		return
 	}
 	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)
@@ -108,6 +119,10 @@ func doCode(update *teleapi.Update) {
 	adv, err := fgaapi.GetRandomCoderAdvice()
 	if err != nil {
 		log.Printf("[Warning] can not get advice for coder: '%s'\n", err)
+		err = bot.SendMessage(update.Message.Chat.ID, fgaAPIFail+"http://fucking-great-advice.ru/advice/coding")
+		if err != nil {
+			log.Printf("[Warning] some troubles with send, err: %s", err)
+		}
 		return
 	}
 	err = bot.SendMessage(update.Message.Chat.ID, adv.Text)
