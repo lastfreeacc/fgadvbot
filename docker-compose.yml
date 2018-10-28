@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+    fgabot:
+        build: .
+        container_name: "fgabot"
+        restart: always
+        volumes:
+            - ${PWD}/conf/fgadvbot.conf.json:/bot/fgadvbot.conf.json
