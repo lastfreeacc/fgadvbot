@@ -6,4 +6,4 @@ services:
         container_name: "fgabot"
         restart: always
         volumes:
-            - ${PWD}/conf/fgadvbot.conf.json:/bot/fgadvbot.conf.json
+            - ./conf/fgadvbot.conf.json:/bot/fgadvbot.conf.json
