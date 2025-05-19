@@ -9,7 +9,7 @@ type AdviceResponse struct {
 
 // Data represents advice
 type Data struct {
-	ID          string     `json:"id"`
+	ID          int64      `json:"id"`
 	Text        string     `json:"text"`
 	HTML        string     `json:"html"`
 	Tags        []string   `json:"tags"`

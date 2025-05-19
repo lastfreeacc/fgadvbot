@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"html"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 )
@@ -14,9 +13,9 @@ import (
 type method string
 
 const (
-	apiURL              = "http://fucking-great-advice.ru/api/"
+	apiURL              = "https://fucking-great-advice.ru/api/"
 	randomMth    method = "random"
-	apiV2URL            = "http://fucking-great-advice.ru/api/v2/"
+	apiV2URL            = "https://fucking-great-advice.ru/api/v2/"
 	randomTagMth method = "random-advices-by-tag?tag="
 	forHerTag           = "for-her"
 	codingTag           = "coding"
@@ -61,7 +60,7 @@ func getAdvice(endPnt string) (*Advice, error) {
 
 	defer body.Close()
 
-	advBytes, err := ioutil.ReadAll(body)
+	advBytes, err := io.ReadAll(body)
 	if err != nil {
 		log.Printf("[Warning] some problems when read body, err: %s\n", err)
 
@@ -88,7 +87,7 @@ func getAdviceV2(endPnt string) (*Advice, error) {
 
 	defer body.Close()
 
-	advBytes, err := ioutil.ReadAll(body)
+	advBytes, err := io.ReadAll(body)
 	if err != nil {
 		log.Printf("[Warning] some problems when read body, err: %s\n", err)
 
@@ -125,7 +124,7 @@ func getBody(endPnt string) (io.ReadCloser, error) {
 		return nil, err
 	}
 	if r.StatusCode >= 400 {
-		log.Printf("[Warning] bad status: %d\n", r.StatusCode)
+		log.Printf("[Warning] bad status: %d for resource: %s\n", r.StatusCode, endPnt)
 
 		return nil, ErrBadStatus
 	}
