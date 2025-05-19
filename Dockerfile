@@ -7,10 +7,9 @@ RUN \
  chown -R bot:bot /bot
 
 # build bot
-ADD . /go/src/github.com/lastfreeacc/fgadvbot
+ADD . /go/src/fgadvbot
 RUN \
- apk add --update --no-progress git && \
- cd /go/src/github.com/lastfreeacc/fgadvbot && \
+ cd /go/src/fgadvbot && \
  go get && \
  go build -o /bot/fgadvbot && \
  apk del git && \
