@@ -12,7 +12,6 @@ RUN \
  cd /go/src/fgadvbot && \
  go get && \
  go build -o /bot/fgadvbot && \
- apk del git && \
  rm -rf /go/src/* && \
  rm -rf /var/cache/apk/*
 
